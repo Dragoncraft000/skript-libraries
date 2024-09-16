@@ -1,0 +1,7 @@
+function posDebugLocation(pos:location,time: timespan= 1 tick,c: color=rgb(255,255,255),a: number=128,text: string="",p: players = all players):
+    create debug marker at {_pos} with color {_c} with alpha {_a} with text {_text} for {_p::*} for {_time}
+
+function posDebugVector(pos:vector,time: timespan= 1 tick,c: color=rgb(255,255,255),a: number=128,text: string="",p: players = all players):
+    loop all players:
+        set {_loc} to {_pos} to location in (world of loop-player)
+        posDebugLocation({_loc},{_time},{_c},{_a},{_text},{_p::*})
