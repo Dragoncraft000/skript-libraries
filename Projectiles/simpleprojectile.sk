@@ -1,0 +1,26 @@
+function shootProjectile(id: number,lifetime: number = 40,v: vector, g: number=0.1,d: number =0):
+    set {-projectiles::%{_id}%::velocity} to {_v}
+
+    set {_heartbeat} to 1
+    loop {_lifetime} / {_heartbeat} times:
+        set {-projectiles::%{_id}%::nextpos} to ({-projectiles::%{_id}%::pos} ~ ({-projectiles::%{_id}%::velocity} *{_heartbeat}))
+        set {_trace} to ray trace from {-projectiles::%{_id}%::pos} along {-projectiles::%{_id}%::velocity} with max distance (distance between {-projectiles::%{_id}%::pos} and {-projectiles::%{_id}%::nextpos}) with ray size {-projectiles::%{_id}%::size}
+        if hit entity of {_trace} is set:
+            ((hit entity of {_trace}) targetable) is false
+            set {_trace} to ray trace from (location 1000 meters below {-projectiles::%{_id}%::pos}) along vector(0,-1,0) with max distance 1
+        if hit location of {_trace} is not set:
+            set {-projectiles::%{_id}%::pos} to {-projectiles::%{_id}%::nextpos}
+            add vector(0,-1*{_g}*{_heartbeat},0) to {-projectiles::%{_id}%::velocity}
+            set {-projectiles::%{_id}%::velocity} to {-projectiles::%{_id}%::velocity}*(1-{_d})
+        else:
+            set {_hitpos} to hit location of {_trace}
+            if hit entity of {_trace} is set:
+                set {_hitpos} to location of hit entity of {_trace}
+            set {-projectiles::%{_id}%::pos} to hit location of {_trace}
+            set {-projectiles::%{_id}%::nextpos} to hit location of {_trace}
+            set {-projectiles::%{_id}%::hit} to true
+            set {-projectiles::%{_id}%::hitpos} to {_hitpos}
+            stop
+            
+        #
+        wait "%{_heartbeat}% ticks" parsed as timespan

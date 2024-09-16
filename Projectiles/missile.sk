@@ -1,0 +1,80 @@
+function shootMissile(id: number,t: entity,d: vector,lifetime: number = 40,v: number=3,tv: number= 30,consistent: boolean= true,speedup:boolean=false):
+    set {-projectiles::%{_id}%::velocity} to {_d}
+    set standard length of {-projectiles::%{_id}%::velocity} to {_v}
+
+    set {_heartbeat} to 1
+    loop {_lifetime} / {_heartbeat} times:
+
+        if {-projectiles::%{_id}%::pos} is not set:
+            stop
+
+        #draw 1 of flame at {-projectiles::%{_id}%::nextpos} with extra 0
+        set {-projectiles::%{_id}%::nextpos} to ({-projectiles::%{_id}%::pos} ~ ({-projectiles::%{_id}%::velocity} *{_heartbeat}))
+        set {_trace} to ray trace from {-projectiles::%{_id}%::pos} along {-projectiles::%{_id}%::velocity} with max distance (distance between {-projectiles::%{_id}%::pos} and {-projectiles::%{_id}%::nextpos}) with ray size {-projectiles::%{_id}%::size}
+        if hit entity of {_trace} is set:
+            ((hit entity of {_trace}) targetable) is false
+            set {_trace} to ray trace from (location 1000 meters below {-projectiles::%{_id}%::pos}) along vector(0,-1,0) with max distance 1
+        if hit location of {_trace} is not set:
+            set {-projectiles::%{_id}%::pos} to {-projectiles::%{_id}%::nextpos}
+
+            set {_diff} to vector between {-projectiles::%{_id}%::pos} and {_t} ~ vector(0,1,0)
+            set {_diff} to normalized {_diff}
+
+            if {_consistent} is true:
+                set {-projectiles::%{_id}%::velocity} to normalized {-projectiles::%{_id}%::velocity}
+                set {_clamp} to {_tv}*{_v}
+                if {_speedup} is true:
+                    set {_clamp} to {_clamp} * (1+ (loop-value/20))
+                set {-projectiles::%{_id}%::velocity} to lerpVectorRotClamped({-projectiles::%{_id}%::velocity},{_diff},{_clamp})
+                set standard length of {-projectiles::%{_id}%::velocity} to {_v}
+            else:
+                set {-projectiles::%{_id}%::velocity} to lerpVectorClamped({-projectiles::%{_id}%::velocity},{_diff},{_tv}*{_v})
+
+            #draw 1 of electric spark at ({-projectiles::%{_id}%::nextpos} ~ {-projectiles::%{_id}%::velocity}*10) with extra 0
+        else:
+            set {_hitpos} to hit location of {_trace}
+            if hit entity of {_trace} is set:
+                set {_hitpos} to location of hit entity of {_trace}
+            set {-projectiles::%{_id}%::pos} to hit location of {_trace}
+            set {-projectiles::%{_id}%::nextpos} to hit location of {_trace}
+            set {-projectiles::%{_id}%::hit} to true
+            set {-projectiles::%{_id}%::hitpos} to {_hitpos}
+            stop
+        #
+        wait "%{_heartbeat}% ticks" parsed as timespan
+
+
+local function lerpVectorClamped(start: vector, end: vector, change: number) :: vector:
+    set {_x} to lerpClamped(x of {_start},x of {_end},{_change})
+    set {_y} to lerpClamped(y of {_start},y of {_end},{_change})
+    set {_z} to lerpClamped(z of {_start},z of {_end},{_change})
+    return vector({_x},{_y},{_z})
+
+local function lerpVectorRotClamped(start: vector, end: vector, change: number) :: vector:
+    set {_pitch} to lerpClamped(pitch of {_start},pitch of {_end},{_change})
+    set {_yaw} to lerpClamped(yaw of {_start},yaw of {_end},{_change},true)
+    return spherical vector radius (standard length of {_start}), yaw {_yaw}, pitch {_pitch}
+
+local function lerpClamped(start: number,end: number, change: number,yaw: boolean= false) :: number:
+
+    if ({_start} is more than {_end}):
+        set {_action} to -1
+    else if ({_start} is less than {_end}):
+        set {_action} to 1
+    else if {_start} is {_end}:
+        set {_action} to 0
+
+    if {_yaw} is true:
+        if (abs({_start} - {_end}) is more than 180):
+            set {_action} to {_action} * -1
+
+    if (abs({_start} - {_end}) is less than {_change}):
+        return {_end}
+    else if ({_action} is -1):
+        return {_start} - {_change}
+    else if ({_action} is 1):  
+        return {_start} + {_change}
+    return {_end}
+
+
+

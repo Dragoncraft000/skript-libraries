@@ -1,0 +1,40 @@
+function createProjectile(l: location,size:number) :: number:
+    set {_projectileId} to random number between 1 and 1000000
+    set {-projectiles::%{_projectileId}%::size} to {_size}
+    set {-projectiles::%{_projectileId}%::pos} to {_l}
+    set {-projectiles::%{_projectileId}%::nextpos} to {_l}
+    set {-projectiles::%{_projectileId}%::velocity} to vector(0,0,0)
+    set {-projectiles::%{_projectileId}%::hit} to false
+    set {-projectiles::%{_projectileId}%::hitpos} to null
+    return {_projectileId}
+
+
+function projectileAlignModel(origin: location,missile: number,model: number,interpolation: number=2):
+    updateClientDisplayPacket({_model})
+    set {_offset} to (vector of projectileNextPosition({_missile})) - (vector of {_origin})
+    addDisplayDataPosition({_model},{_offset})
+    set {_velocity} to projectileVelocity({_missile})
+    addDisplayDataRotation({_model},-1*yaw of {_velocity},vector(0,1,0))
+    addDisplayDataRightRotation({_model},pitch of {_velocity},vector(1,0,0))
+    addDisplayDataInterpolation({_model},{_interpolation})
+    sendClientDisplayUpdate({_model})
+
+
+function projectileHasHit(id: number) :: boolean:
+    return {-projectiles::%{_id}%::hit}
+
+function projectileHitPosition(id: number) :: location:
+    return {-projectiles::%{_id}%::hitpos}
+
+function projectilePosition(id: number) :: location:
+    return {-projectiles::%{_id}%::pos}
+
+function projectileNextPosition(id: number) :: location:
+    return {-projectiles::%{_id}%::nextpos}
+
+function projectileVelocity(id: number) :: vector:
+    return {-projectiles::%{_id}%::velocity}
+
+
+function deleteProjectile(id: number):
+    delete {-projectiles::%{_id}%::*}
