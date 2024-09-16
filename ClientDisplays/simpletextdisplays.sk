@@ -1,0 +1,36 @@
+function clientTextDisplay(loc:location,range:number = 60,p:players= all players) :: number:
+    set {_id} to random integer between 1 and 999999
+    spawn fake Text Display at {_loc} for {_p::*} with id {_id}
+    set {_packet} to metadata packet with id {_id}
+    add data from "display interpolation delay 1" to packet {_packet}
+    add data from "display view range %{_range}%" to packet {_packet}
+    return {_id}
+
+function updateClientDisplayText(id:number,text:string):
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display text %{_text}%" to packet {_packet}
+    send packet {_packet} to all players
+
+
+function updateClientDisplayBillboard(id:number,type:string):
+    {_type} is "fixed" or "vertical" or "horizontal" or "center"
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display billboard %{_type}%" to packet {_packet}
+    send packet {_packet} to all players
+
+function updateClientDisplayBackground(id:number,r: number=0,g:number=0,b:number=0,a: number=0):
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display background %{_a}% %{_r}% %{_g}% %{_b}%" to packet {_packet}
+    send packet {_packet} to all players
+
+
+function updateClientDisplayDimensions(id:number,w: number,h:number):
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display width %{_w}%" to packet {_packet}
+    add data from "display height %{_h}%" to packet {_packet}
+    send packet {_packet} to all players
+
+function updateClientDisplayLine(id:number,w: number):
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display line width %{_w}%" to packet {_packet}
+    send packet {_packet} to all players

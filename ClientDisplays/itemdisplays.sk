@@ -1,0 +1,94 @@
+function clientEffectDisplay(loc:location,range:number = 64,p:players= all players) :: number:
+    set {_id} to random integer between 1 and 999999
+    spawn fake Item Display at {_loc} for {_p::*} with id {_id}
+    set {_packet} to metadata packet with id {_id}
+    add data from "display interpolation delay 1" to packet {_packet}
+    add data from "display view range %{_range}/64%" to packet {_packet}
+    send packet {_packet} to {_p::*}
+    return {_id}
+
+function namedClientEffectDisplay(id: number,loc:location,p:players= all players):
+    spawn fake Item Display at {_loc} for {_p::*} with id {_id}
+
+
+function removeClientEffectDisplay(id: number,p:players= all players):
+    remove fake entity with id {_id} for {_p::*}
+
+function clientBlockDisplay(loc:location,range:number = 60,p:players= all players) :: number:
+    set {_id} to random integer between 1 and 999999
+    spawn fake Block Display at {_loc} for {_p::*} with id {_id}
+    set {_packet} to metadata packet with id {_id}
+    add data from "display interpolation delay 1" to packet {_packet}
+    add data from "display view range %{_range}%" to packet {_packet}
+    return {_id}
+
+
+function updateClientDisplayItem(id:number,item:item,p:players= all players):
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display item" with {_item} to packet {_packet}
+    send packet {_packet} to {_p::*}
+
+function updateClientDisplayBlock(id:number,item:item,p:players= all players):
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display block" with stone[] to packet {_packet}
+    send packet {_packet} to {_p::*}
+
+function updateClientDisplayPosition(id: number, translation: vector,p:players= all players):
+    set {_packet} to raw metadata packet with id {_id}
+    set {_x} to x of {_translation}
+    set {_y} to y of {_translation}
+    set {_z} to z of {_translation}
+
+    add data from "display translation %{_x}% %{_y}% %{_z}%" to packet {_packet}
+    send packet {_packet} to {_p::*}
+
+
+
+function updateClientDisplayInterpolation(id: number,ticks: number = 1,p:players= all players):
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display interpolation delay 0" to packet {_packet}
+    add data from "display transformation duration %{_ticks}%" to packet {_packet}
+    send packet {_packet} to {_p::*}
+
+function updateClientDisplayTeleport(id: number,ticks: number = 1,p:players= all players):
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display posrot %{_ticks}%" to packet {_packet}
+    send packet {_packet} to {_p::*}
+
+function teleportClientDisplay(id: number, loc: location,p:players= all players):
+    send teleport packet with id {_id} with location {_loc} to {_p::*}
+
+
+
+function updateClientDisplayScale(id: number, scale: vector,p:players= all players):
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display scale %x of {_scale}% %y of {_scale}% %z of {_scale}%" to packet {_packet}
+    send packet {_packet} to {_p::*}
+
+function updateClientDisplayRightRotation(id: number,angle: number, axis: vector,p:players= all players):
+    set {_packet} to raw metadata packet with id {_id}
+    set {_v} to axisAngleFromVector({_angle}, {_axis})
+    add data from "display right rotation %quat-x of {_v}% %quat-y of {_v}% %quat-z of {_v}% %quat-w of {_v}%" to packet {_packet}
+    send packet {_packet} to {_p::*}
+
+function updateClientDisplayRotation(id: number,angle: number, axis: vector,p:players= all players):
+    set {_packet} to raw metadata packet with id {_id}
+    set {_v} to axisAngleFromVector({_angle}, {_axis})
+    add data from "display left rotation %quat-x of {_v}% %quat-y of {_v}% %quat-z of {_v}% %quat-w of {_v}%" to packet {_packet}
+    send packet {_packet} to {_p::*}
+
+function updateClientDisplayMultiRotation(id: number,axis: vector,p:players= all players):
+    set {_packet} to raw metadata packet with id {_id}
+    set {_v} to quaternion from {_axis}
+    add data from "display left rotation %quat-x of {_v}% %quat-y of {_v}% %quat-z of {_v}% %quat-w of {_v}%" to packet {_packet}
+    send packet {_packet} to {_p::*}
+
+function updateClientDisplayViewRange(id: number,range: number,p:players= all players):
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display view range %{_range} / 64%" to packet {_packet}
+    send packet {_packet} to {_p::*}
+
+function updateClientDisplayBrightness(id: number,brightness: number,p:players= all players):
+    set {_packet} to raw metadata packet with id {_id}
+    add data from "display brightness %{_brightness}% %{_brightness}%" to packet {_packet}
+    send packet {_packet} to {_p::*}

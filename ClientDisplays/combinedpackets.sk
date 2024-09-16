@@ -1,0 +1,32 @@
+function updateClientDisplayPacket(id: number):
+    set {-displaypacket::%{_id}%} to raw metadata packet with id {_id}
+
+
+function sendClientDisplayUpdate(id: number):
+    send packet {-displaypacket::%{_id}%} to all players
+    delete {-displaypacket::%{_id}%}
+
+function addDisplayDataPosition(id: number, translation: vector,ticks: number = 1):
+    set {_x} to x of {_translation}
+    set {_y} to y of {_translation}
+    set {_z} to z of {_translation}
+
+    add data from "display translation %{_x}% %{_y}% %{_z}%" to packet {-displaypacket::%{_id}%}
+
+
+
+function addDisplayDataInterpolation(id: number,ticks: number = 1):
+    add data from "display interpolation delay 0" to packet {-displaypacket::%{_id}%}
+    add data from "display transformation duration %{_ticks}%" to packet {-displaypacket::%{_id}%}
+
+function addDisplayDataScale(id: number, scale: vector):
+    add data from "display scale %x of {_scale}% %y of {_scale}% %z of {_scale}%" to packet {-displaypacket::%{_id}%}
+
+function addDisplayDataRightRotation(id: number,angle: number, axis: vector):
+    set {_v} to axisAngleFromVector({_angle}, {_axis})
+    add data from "display right rotation %quat-x of {_v}% %quat-y of {_v}% %quat-z of {_v}% %quat-w of {_v}%" to packet {-displaypacket::%{_id}%}
+
+function addDisplayDataRotation(id: number,angle: number, axis: vector):
+    set {_v} to axisAngleFromVector({_angle}, {_axis})
+    add data from "display left rotation %quat-x of {_v}% %quat-y of {_v}% %quat-z of {_v}% %quat-w of {_v}%" to packet {-displaypacket::%{_id}%}
+
