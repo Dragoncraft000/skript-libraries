@@ -1,0 +1,11 @@
+import:
+    java.lang.Character
+    java.lang.Integer
+
+function character(unicode: strings) :: string:
+    set {_string} to ""
+    loop {_unicode::*}:
+        set {_code} to join (regex split loop-value by "[^\dA-F]+")
+        set {_n} to Integer.valueOf({_code} and 16)
+        set {_string} to "%{_string}%%Character.toChars({_n})[0]%"
+    return {_string}
